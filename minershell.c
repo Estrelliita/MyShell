@@ -81,7 +81,7 @@ int main(int arfc, char* argv[]){
   char **tokens;
   int i;
 
-  const char *commands = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit"};
+  const char* commands[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit"};
 
   void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
   
