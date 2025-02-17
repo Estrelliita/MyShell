@@ -40,7 +40,7 @@ char **tokenize(char *line){
 void f_ls(char **tokens){
   pid_t pid = fork();
 
-  if (pid == 0){ //if this is the child process execute
+  if (pid == 0){ //Child process
     execvp(tokens[0], tokens);
     printf("execvp");
     exit(1);
@@ -48,29 +48,82 @@ void f_ls(char **tokens){
     perror("Fork failed");
   } else {
     int status;
-    waitpid(pid, &status, 0);  // Parent process terminate.    
+    waitpid(pid, &status, 0);  // Parent process waits for child to finish    
   }
-  
-
 }
 
-void f_cd(){}
+void f_cd(char **tokens){
+   if (tokens[1] != NULL) { //Check if argument (dir) is provided
+        if (chdir(tokens[1]) != 0) {
+            perror("chdir failed");
+        }
+    } else {
+        chdir(getenv("HOME")); //Go to home directory of no arguments are provided
+    }
+}
 
-void f_pwd(){}
+void f_pwd(char **tokens){ //No need to fork here because pwd operates directly on current process's environment
+    char cwd[1024]; //Char array for current working directory limited to 1024 bytes to prevent overflow
+    if (getcwd(cwd, sizeof(cwd)) != NULL) { 
+        printf("%s\n", cwd);
+    } else {
+        perror("getcwd");
+    }
+}
 
-void f_cat(char **tokens){}
+void f_cat(char **tokens){
+  pid_t pid = fork();
 
-void f_ps(char **tokens){}
+  if (pid == 0){ //Child process
+    execvp("/bin/cat", tokens);
+    exit(1);
+  } else if(pid < 0){
+    perror("Fork failed");
+  } else {
+    int status;
+    waitpid(pid, &status, 0);  // Parent process waits for child to finish    
+  }
+}
 
-void f_echo(char **tokens){}
+void f_ps(char **tokens){
+  pid_t pid = fork();
 
-void f_wc(char **tokens){}
+  if (pid == 0){ //Child process
+    execvp("/bin/ps", tokens);
+    exit(1);
+  } else if(pid < 0){
+    perror("Fork failed");
+  } else {
+    int status;
+    waitpid(pid, &status, 0);  // Parent process waits for child to finish    
+  }
 
-void f_top(char **tokens){}
+	
+}
 
-void f_grep(char **tokens){}
+void f_echo(char **tokens){
+	for (int i = 1; tokens[i] != NULL; i++) { //Start from second token since first was the command
+        printf("%s ", tokens[i]);
+    }
+    printf("\n");
+}
 
-void f_sleep(char **tokens){}
+void f_wc(char **tokens){
+	
+}
+
+void f_top(char **tokens){} //Not implememted yet
+
+void f_grep(char **tokens){} //Not implemented yet
+
+void f_sleep(char **tokens){
+   if(tokens[1] != NULL) {
+      unsigned int duration = atoi(tokens[1]);
+      sleep(duration); //sleep as long as user typed in second token
+   } else{
+	   perror("Sleep missing argument\n")
+   }
+}
 
 void f_exit(char **tokens){
   exit(0);
