@@ -109,7 +109,17 @@ void f_echo(char **tokens){
 }
 
 void f_wc(char **tokens){
-	
+  pid_t pid = fork();
+
+  if (pid == 0){ //Child process
+    execvp("/bin/wc", tokens);
+    exit(1);
+  } else if(pid < 0){
+    perror("Fork failed");
+  } else {
+    int status;
+    waitpid(pid, &status, 0);  // Parent process waits for child to finish    
+  }
 }
 
 void f_top(char **tokens){} //Not implememted yet
