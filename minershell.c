@@ -96,9 +96,7 @@ void f_ps(char **tokens){
   } else {
     int status;
     waitpid(pid, &status, 0);  // Parent process waits for child to finish    
-  }
-
-	
+  }	
 }
 
 void f_echo(char **tokens){
@@ -131,7 +129,7 @@ void f_sleep(char **tokens){
       unsigned int duration = atoi(tokens[1]);
       sleep(duration); //sleep as long as user typed in second token
    } else{
-	   perror("Sleep missing argument\n")
+     perror("Sleep missing argument\n");
    }
 }
 
@@ -144,7 +142,7 @@ int main(int arfc, char* argv[]){
   char **tokens;
   int i;
 
-  const char* commands[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit"};
+  const char *commands[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit", NULL}; //Noticed that without NULL terminator I would get a Segmentation fault
 
   void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
   
@@ -156,7 +154,7 @@ int main(int arfc, char* argv[]){
     scanf("%[^\n]", line);
     getchar();
 
-    printf("Command entered: %s (remove this debug output later)\n", line);
+    //printf("Command entered: %s (remove this debug output later)\n", line);
       /* END: TAKING INPUT */
     
     line[strlen(line)] = '\n'; //terminate wi
