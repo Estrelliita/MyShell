@@ -249,10 +249,7 @@ void execute_pipeline(char *line){
 
 }
 
-void execute_command(char *line){
-
-
-}
+#include <stdio.h>
 
 int main(int arfc, char* argv[]){
   char line[MAX_INPUT_SIZE];
