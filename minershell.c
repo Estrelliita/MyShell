@@ -16,7 +16,7 @@ char **tokenize(char *line){
   char *token = (char *)malloc(MAX_TOKEN_SIZE * sizeof(char));
   int i, tokenIndex = 0, tokenNo = 0;
 
-  for(i=0; i < strlen(line); i++){
+  for(int i=0; i < strlen(line); i++){
     char readChar = line[i];
 
     if(readChar == ' ' || readChar == '\n' || readChar == '\t'){
@@ -204,18 +204,18 @@ void execute_pipeline(char *line){
       //Pipe redirection logic
       if(i>0){ //If this is not the first command
 	dup2(pipes[i-1][0], STDIN_FILENO); //Read from previous pipe
-	close(pipes[i-1][1]; //close write end
+	close(pipes[i-1][1]); //close write end
       }
       if(i<num_commands -1){//if this is not the last command
 	dup2(pipes[i][1], STDOUT_FILENO);//write to next pipe
-	close(pipes[i][0]; //close read end
+	close(pipes[i][0]); //close read end
       }
 
       //Close all other pipe ends
       for (int j = 0; j < num_commands -1; j++){
 	if(j!=i-1 && j != i){
 	  close(pipes[j][0]);
-	  close(piepes[j][1]);
+	  close(pipes[j][1]);
 	}
       }
 
@@ -261,14 +261,14 @@ int main(int arfc, char* argv[]){
 
 
   const char *commands[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit", NULL};
-  void (*command_funct[])(char **) = {execute_command, f_cd, execute_command, exexcute_command, execute_command, execute_command, execute_command, execute_command, execute_command, execute_command, f_exit};
+  void (*command_funct[])(char **) = {execute_command, f_cd, execute_command, execute_command, execute_command, execute_command, execute_command, execute_command, execute_command, execute_command, f_exit};
   
   while(1){
 
     /*BEGIN: TAKING INPUT */
     bzero(line, sizeof(line));
     printf("$ ");
-    scanf("%[^\n]", line)
+    scanf("%[^\n]", line);
     getchar();
     /* END: TAKING INPUT */
 
