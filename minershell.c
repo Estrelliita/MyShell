@@ -262,7 +262,7 @@ void execute_pipeline(char *line){
       int command_found = 0;
       for (int k = 0; commands_list[k] != NULL; k++) {
           if (strcmp(tokens[0], commands_list[k]) == 0) {
-              command_funt[k](tokens); // Call the command handler
+              command_funct[k](tokens); // Call the command handler
               command_found = 1;
               break;
           }
