@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKEN_SIZE 64
@@ -153,7 +154,7 @@ void execute_pipeline(char *line){
 
 
   //2. Loop through pipeline stages
-  for(i = 0; i < num_commands; i++){
+  for(int i = 0; i < num_commands; i++){
     //3. Create pipes except for last command
 
     //Last command, no pipe created
@@ -182,7 +183,7 @@ void execute_pipeline(char *line){
 	}
       }
       if(in_file != NULL){
-	int fd = open(in_file, ORDONLY);
+	int fd = open(in_file, O_RDONLY);
 	if(fd == -1){ //throw error if input file can't be opened
 	  perror("Failure to open input file");
 	  exit(1);
