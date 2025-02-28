@@ -292,7 +292,7 @@ void execute_pipeline(char *line){
       for(int i = 0; i<num_commands; i++){
 	free(commands[i]);
       }
-
+  }
 }
 
 int main(int arfc, char* argv[]){
@@ -350,7 +350,7 @@ int main(int arfc, char* argv[]){
     for(i=0;tokens[i]!=NULL;i++){
       free(tokens[i]);
      }
-    free(tokens);
+     free(tokens);
   }  
   return 0;
 }
