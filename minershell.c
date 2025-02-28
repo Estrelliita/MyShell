@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKEN_SIZE 64
@@ -211,11 +212,11 @@ void execute_pipeline(char *line){
   //2. Loop through pipeline stages
   for(int i = 0; i < num_commands; i++){
     //3. Create pipes except for last command
-
-    //Last command, no pipe created
-    if((i<num_commands-1) && pipe(pipes[i] == -1)){
-      perror("pipe");
-      exit(1);
+    if (i < num_commands - 1) {
+       if (pipe(pipes[i]) == -1) { // Corrected line
+          perror("pipe");
+          exit(1);
+       }
     }
   
     //4. Fork
@@ -261,7 +262,7 @@ void execute_pipeline(char *line){
       int command_found = 0;
       for (int k = 0; commands_list[k] != NULL; k++) {
           if (strcmp(tokens[0], commands_list[k]) == 0) {
-              command_funcs[k](tokens); // Call the command handler
+              command_funt[k](tokens); // Call the command handler
               command_found = 1;
               break;
           }
@@ -293,8 +294,6 @@ void execute_pipeline(char *line){
       }
 
 }
-
-#include <stdio.h>
 
 int main(int arfc, char* argv[]){
   char line[MAX_INPUT_SIZE];
