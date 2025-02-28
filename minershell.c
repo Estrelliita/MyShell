@@ -10,7 +10,7 @@
 #define MAX_NUM_TOKENS 64
 #define MAX_COMMANDS 10 //Max number of commands in a pipeline for now
 const char *commands_list[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit", NULL};
-void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
+//void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
 
 
 /*Split the string by space and return the array of tokens**/
@@ -191,6 +191,8 @@ void f_sleep(char **tokens){
 void f_exit(char **tokens){
   exit(0);
 }
+
+void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
 
 void execute_pipeline(char *line){
 
