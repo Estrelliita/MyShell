@@ -102,7 +102,7 @@ void f_ls(char **tokens){
   pid_t pid = fork();
 
   if (pid == 0){ //Child process
-    execvp("usr/bin/ls", tokens);
+    execvp(tokens[0], tokens);
     perror("execvp");
     exit(1);
   } else if(pid < 0){
