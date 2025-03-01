@@ -35,6 +35,11 @@ char **tokenize(char *line){
     }else{
       token[tokenIndex++] = readChar; //Add character to the current token
     }
+    printf("Tokens: ");
+    for (int j = 0; tokens[j] != NULL; j++) {
+    	printf("'%s' ", tokens[j]);
+    }
+    printf("\n");
 
   }
   
@@ -97,8 +102,8 @@ void f_ls(char **tokens){
   pid_t pid = fork();
 
   if (pid == 0){ //Child process
-    execvp(tokens[0], tokens);
-    printf("execvp");
+    execvp("usr/bin/ls", tokens);
+    perror("execvp");
     exit(1);
   } else if(pid < 0){
     perror("Fork failed");
@@ -275,6 +280,7 @@ void execute_pipeline(char *line){
           //Execute commands
           int command_found = 0;
           for (int k = 0; commands_list[k] != NULL; k++) {
+	     printf("Child process executing: %s\n", tokens[k]); 
              if (strcmp(tokens[0], commands_list[k]) == 0) {
                 command_funct[k](tokens); // Call the command handler
                 command_found = 1;
