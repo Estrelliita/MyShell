@@ -203,7 +203,7 @@ void execute_pipeline(char *line){
   char *token; //pointer to next token
   char *rest = line; //pointer to the remaining line
 
-  while((token = strtok_r(rest, '|', &rest))){
+  while((token = strtok_r(rest, "|", &rest))){
     commands[num_commands++] = strdup(token);
   }
   int pipes[num_commands -1][2]; /*[num_c -1] because there will be one less pippe than the number of commands, and [2] because there are 2 file descriptors per pipe (read & write)*/
