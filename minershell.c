@@ -198,101 +198,108 @@ void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc
 void execute_pipeline(char *line){
 
   //1. Parse into pipelines
-  char *commands[MAX_COMMANDS];
-  int num_commands = 0;
-  char *token; //pointer to next token
-  char *rest = line; //pointer to the remaining line
+   char *commands[MAX_COMMANDS];
+   int num_commands = 0;
+   char *token; //pointer to next token
+   char *rest = line; //pointer to the remaining line
 
-  while((token = strtok_r(rest, "|", &rest))){
-    commands[num_commands++] = strdup(token);
-  }
-  int pipes[num_commands -1][2]; /*[num_c -1] because there will be one less pippe than the number of commands, and [2] because there are 2 file descriptors per pipe (read & write)*/
+   while((token = strtok_r(rest, "|", &rest))){
+      commands[num_commands++] = strdup(token);
+   }
+   int pipes[num_commands -1][2]; /*[num_c -1] because there will be one less pippe than the number of commands, and [2] because there are 2 file descriptors per pipe (read & write)*/
 
 
   //2. Loop through pipeline stages
-  for(int i = 0; i < num_commands; i++){
+   for(int i = 0; i < num_commands; i++){
     //3. Create pipes except for last command
-    if (i < num_commands - 1) {
-       if (pipe(pipes[i]) == -1) { // Corrected line
-          perror("pipe");
-          exit(1);
-       }
-    }
-  
-    //4. Fork
-    pid_t pid = fork();
-    if(pid == 0){ //if child process
-      char **tokens = tokenize(commands[i]);
-
-      //Redirection logic
-      // Check for redirection
-      int redirection_found = 0;
-      for (int j = 0; tokens[j] != NULL; j++) {
-         if (strcmp(tokens[j], "<") == 0 || strcmp(tokens[j], ">") == 0) {
-            redirection_found = 1;
-            break;
+      if (i < num_commands - 1) {
+         if (pipe(pipes[i]) == -1) { // Corrected line
+            perror("pipe");
+            exit(1);
          }
       }
+  
+      //4. Fork
+      pid_t pid = fork();
+      if(pid == 0){ //if child process
+         char **tokens = tokenize(commands[i]);
 
-      int stdout_fd = -1;
-      int stderr_fd = -1;
-      if (redirection_found) {
-         handle_redirection(tokens, &stdout_fd, &stderr_fd);
-      }
-
-       //Pipe redirection logic
-      if(i>0){ //If this is not the first command
-	 dup2(pipes[i-1][0], STDIN_FILENO); //Read from previous pipe
-	 close(pipes[i-1][1]); //close write end
-      }
-      if(i<num_commands -1){//if this is not the last command
-	 dup2(pipes[i][1], STDOUT_FILENO);//write to next pipe
-	 close(pipes[i][0]); //close read end
-      }
-
-      //Close all other pipe ends
-      for (int j = 0; j < num_commands -1; j++){
-	if(j!=i-1 && j != i){
-	  close(pipes[j][0]);
-	  close(pipes[j][1]);
-	}
-      }
-
-      //Execute commands
-      int command_found = 0;
-      for (int k = 0; commands_list[k] != NULL; k++) {
-          if (strcmp(tokens[0], commands_list[k]) == 0) {
-              command_funct[k](tokens); // Call the command handler
-              command_found = 1;
-              break;
+         //Redirection logic
+         // Check for redirection
+         int redirection_found = 0;
+         for (int j = 0; tokens[j] != NULL; j++) {
+            if (strcmp(tokens[j], "<") == 0 || strcmp(tokens[j], ">") == 0) {
+               redirection_found = 1;
+               break;
+            }
           }
-      }
-      if (redirection_found) {
-                restore_redirection(stdout_fd, stderr_fd);
-      }
-	    
-    }else if(pid >0){//Parent process
-	//Close unused pipe ends
-	if(i>0){
-	  close(pipes[i-1][0]);
-	  close(pipes[i-1][1]);
-	}
-	if(i==num_commands-1){
-	  for(int j = 0; j<num_commands-1;j++){
-	    close(pipes[j][0]);
-	    close(pipes[j][1]);
-	  }
-	}
-	if(i==num_commands-1){
-	  for(int j = 0; j <num_commands;j++){
-	    wait(NULL);}
-	}
-      }
 
-      for(int i = 0; i<num_commands; i++){
-	free(commands[i]);
+          int stdout_fd = -1;
+          int stderr_fd = -1;
+          if (redirection_found) {
+             handle_redirection(tokens, &stdout_fd, &stderr_fd);
+          }
+
+          //Pipe redirection logic
+      	  if(i>0){ //If this is not the first command
+	     dup2(pipes[i-1][0], STDIN_FILENO); //Read from previous pipe
+	     close(pipes[i-1][1]); //close write end
+          }
+          if(i<num_commands -1){//if this is not the last command
+	     dup2(pipes[i][1], STDOUT_FILENO);//write to next pipe
+	     close(pipes[i][0]); //close read end
+           }
+
+          //Close all other pipe ends
+          for (int j = 0; j < num_commands -1; j++){
+	     if(j!=i-1 && j != i){
+	        close(pipes[j][0]);
+	        close(pipes[j][1]);
+	     }
+          }
+
+          //Execute commands
+          int command_found = 0;
+          for (int k = 0; commands_list[k] != NULL; k++) {
+             if (strcmp(tokens[0], commands_list[k]) == 0) {
+                command_funct[k](tokens); // Call the command handler
+                command_found = 1;
+                break;
+             }
+          }
+          if (redirection_found) {
+                restore_redirection(stdout_fd, stderr_fd);
+          }
+          for (int j = 0; tokens[j] != NULL; j++){
+	    free(tokens[j]);
+          }
+          free(tokens);
+          exit(0);
+	    
+      }else if(pid > 0){//Parent process
+         //Close unused pipe ends
+          if(i>0){
+	     close(pipes[i-1][0]);
+	     close(pipes[i-1][1]);
+	   }
+	   if(i==num_commands-1){
+	      for(int j = 0; j<num_commands-1;j++){
+	         close(pipes[j][0]);
+	         close(pipes[j][1]);
+	      }
+	   }
+	   if(i==num_commands-1){
+	      for(int j = 0; j <num_commands;j++){
+	         wait(NULL);}
+	      }
+      }else{
+	  perror("fork");
+	  exit(1);
       }
-  }
+    }
+    for(int i = 0; i<num_commands; i++){
+	free(commands[i]);
+    }
 }
 
 int main(int arfc, char* argv[]){
