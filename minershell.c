@@ -349,15 +349,13 @@ int main(int arfc, char* argv[]){
       if(redirection_found){
 	restore_redirection(stdout_fd, stderr_fd);
       }
-
-    }
-    
-    
     // Freeing the allocated memory
     for(i=0;tokens[i]!=NULL;i++){
       free(tokens[i]);
      }
      free(tokens);
+
+    }
   }  
   return 0;
 }
