@@ -24,6 +24,33 @@ char **tokenize(char *line){
   for(int i=0; i < strlen(line); i++){
     char readChar = line[i];
 
+    if(readChar == '~'){
+	char *home = getenv("HOME");
+	if(home == NULL){
+	   home = "/home/eblara"
+	}
+	// Copy home directory to token (with buffer overflow check)
+        int homeLen = strlen(home);
+        if (tokenIndex + homeLen < MAX_TOKEN_SIZE - 1) {
+           strcpy(token + tokenIndex, home);
+           tokenIndex += homeLen;
+
+            // Handle potential characters after ~ (e.g., ~/Documents)
+            i++; // Move past '~' in the input
+            while (i < strlen(line) && line[i] != ' ' && line[i] != '\n' && line[i] != '\t') {
+               if (tokenIndex < MAX_TOKEN_SIZE - 1) { // Check for buffer overflow
+                  token[tokenIndex++] = line[i++];
+               } else {
+                  fprintf(stderr, "Token buffer overflow.\n");
+                  break; // Stop copying if the token buffer is full
+               }
+            }
+            i--; // Adjust for the loop increment
+        } else {
+            fprintf(stderr, "Token buffer overflow (home directory too long).\n");
+        }
+	    
+    }
     if(readChar == ' ' || readChar == '\n' || readChar == '\t'){
       token[tokenIndex] = '\0'; //Null-terminate the current token
       if(tokenIndex != 0){ //If the token is not empty
