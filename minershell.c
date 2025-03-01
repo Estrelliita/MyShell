@@ -372,10 +372,19 @@ int main(int arfc, char* argv[]){
       line[strlen(line)] = '\n';
       tokens = tokenize(line);
 
+      // Create a copy of tokens
+      char **tokens_copy = (char **)malloc(MAX_NUM_TOKENS * sizeof(char *));
+      int token_count = 0;
+      for (int i = 0; tokens[i] != NULL; i++) {
+          tokens_copy[i] = strdup(tokens[i]); // Duplicate each token
+          token_count++;
+      }
+      tokens_copy[token_count] = NULL;
+
       // Check for redirection operators
       int redirection_found = 0;
-      for (int i = 0; tokens[i] != NULL; i++) {
-         if (strcmp(tokens[i], "<") == 0 || strcmp(tokens[i], ">") == 0) {
+      for (int i = 0; tokens_copy[i] != NULL; i++) {
+         if (strcmp(tokens_copy[i], "<") == 0 || strcmp(tokens_copy[i], ">") == 0) {
             redirection_found = 1;
             break;
          }
@@ -388,8 +397,8 @@ int main(int arfc, char* argv[]){
       }
 
       for(i=0; commands_list[i]!=NULL;i++){
-	if(strcmp(tokens[0], commands_list[i]) == 0){
-	  command_funct[i](tokens); /*call corresponding function. Notice that execute_command is called for the commands that require fork(), execvp() and or redirection. It will also handle redirection*/
+	if(strcmp(tokens_copy[0], commands_list[i]) == 0){
+	  command_funct[i](tokens_copy); /*call corresponding function. Notice that execute_command is called for the commands that require fork(), execvp() and or redirection. It will also handle redirection*/
 	}        
       }
 
@@ -399,8 +408,13 @@ int main(int arfc, char* argv[]){
     // Freeing the allocated memory
     for(i=0;tokens[i]!=NULL;i++){
       free(tokens[i]);
+    }
+    free(tokens);
+
+    for(i=0;tokens_copy[i]!=NULL;i++){
+      free(tokens_copy[i]);
      }
-     free(tokens);
+     free(tokens_copy);
 
     }
   }  
