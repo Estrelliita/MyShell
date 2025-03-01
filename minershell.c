@@ -27,7 +27,7 @@ char **tokenize(char *line){
     if(readChar == '~'){
 	char *home = getenv("HOME");
 	if(home == NULL){
-	   home = "/home/eblara"
+	   home = "/home/eblara";
 	}
 	// Copy home directory to token (with buffer overflow check)
         int homeLen = strlen(home);
