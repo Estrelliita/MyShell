@@ -10,7 +10,7 @@
 #define MAX_TOKEN_SIZE 64
 #define MAX_NUM_TOKENS 64
 #define MAX_COMMANDS 10 //Max number of commands in a pipeline for now
-const char *commands_list[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sleep", "exit", NULL};
+const char *commands_list[] = {"ls", "cd", "pwd", "cat", "ps", "echo", "wc", "top", "grep", "sort", "sleep", "exit", NULL};
 //void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
 
 
@@ -179,6 +179,20 @@ void f_wc(char **tokens){
 void f_top(char **tokens){} //Not implememted yet
 
 void f_grep(char **tokens){} //Not implemented yet
+void f_sort(char **tokens) {
+    pid_t pid = fork();
+
+    if (pid == 0) { // Child process
+        execvp("/usr/bin/sort", tokens); // Use the full path to sort
+        perror("execvp sort");
+        exit(1);
+    } else if (pid < 0) {
+        perror("Fork failed");
+    } else {
+        int status;
+        waitpid(pid, &status, 0);
+    }
+}
 
 void f_sleep(char **tokens){
    if(tokens[1] != NULL) {
@@ -193,7 +207,7 @@ void f_exit(char **tokens){
   exit(0);
 }
 
-void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sleep, f_exit};
+void (*command_funct[])(char **) = {f_ls, f_cd, f_pwd, f_cat, f_ps, f_echo, f_wc, f_top, f_grep, f_sort, f_sleep, f_exit};
 
 void execute_pipeline(char *line){
 
